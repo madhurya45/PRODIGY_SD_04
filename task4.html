@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudoku Solver</title>
+<style>
+    table {
+        border-collapse: collapse;
+        margin: 20px auto;
+    }
+    td {
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        border: 1px solid black;
+    }
+</style>
+</head>
+<body>
+
+<script>
+function SudokuSolver(grid) {
+    this.grid = grid;
+
+    this.solve = function() {
+        const emptyCell = this.findEmpty();
+        if (!emptyCell) {
+            return true;
+        }
+        const [row, col] = emptyCell;
+
+        for (let num = 1; num <= 9; num++) {
+            if (this.isValid(row, col, num)) {
+                this.grid[row][col] = num;
+
+                if (this.solve()) {
+                    return true;
+                }
+
+                this.grid[row][col] = 0;
+            }
+        }
+
+        return false;
+    };
+
+    this.findEmpty = function() {
+        for (let i = 0; i < 9; i++) {
+            for (let j = 0; j < 9; j++) {
+                if (this.grid[i][j] === 0) {
+                    return [i, j];
+                }
+            }
+        }
+        return null;
+    };
+
+    this.isValid = function(row, col, num) {
+        for (let i = 0; i < 9; i++) {
+            if (this.grid[row][i] === num || this.grid[i][col] === num) {
+                return false;
+            }
+        }
+
+        const startRow = 3 * Math.floor(row / 3);
+        const startCol = 3 * Math.floor(col / 3);
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (this.grid[i + startRow][j + startCol] === num) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
+    this.generateHTML = function() {
+        let html = "<table>\n";
+        for (let row of this.grid) {
+            html += "<tr>\n";
+            for (let num of row) {
+                html += `<td>${num === 0 ? '' : num}</td>`;
+            }
+            html += "</tr>\n";
+        }
+        html += "</table>";
+        return html;
+    };
+}
+
+function solveSudoku() {
+    const sudokuGrid = [
+        [5, 3, 0, 0, 7, 0, 0, 0, 0],
+        [6, 0, 0, 1, 9, 5, 0, 0, 0],
+        [0, 9, 8, 0, 0, 0, 0, 6, 0],
+        [8, 0, 0, 0, 6, 0, 0, 0, 3],
+        [4, 0, 0, 8, 0, 3, 0, 0, 1],
+        [7, 0, 0, 0, 2, 0, 0, 0, 6],
+        [0, 6, 0, 0, 0, 0, 2, 8, 0],
+        [0, 0, 0, 4, 1, 9, 0, 0, 5],
+        [0, 0, 0, 0, 8, 0, 0, 7, 9]
+    ];
+
+    const solver = new SudokuSolver(sudokuGrid);
+    if (solver.solve()) {
+        const htmlOutput = solver.generateHTML();
+        document.getElementById("sudoku").innerHTML = htmlOutput;
+    } else {
+        alert("No solution exists for the given Sudoku puzzle.");
+    }
+}
+
+solveSudoku();
+</script>
+
+<div id="sudoku"></div>
+
+</body>
+</html>
+
+
+
